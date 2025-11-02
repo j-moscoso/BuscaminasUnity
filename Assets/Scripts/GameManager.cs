@@ -22,6 +22,20 @@ public class GameManager : MonoBehaviour
     /// <summary>GridLayoutGroup para organizar las celdas</summary>
     [SerializeField] private GridLayoutGroup gridLayout;
 
+    // ========== REFERENCIAS AUDIO ==========
+    /// <summary>AudioSource para reproducir sonidos</summary>
+    [Header("Audio")]
+    [SerializeField] private AudioSource audioSource;
+
+    /// <summary>Sonido al revelar una celda</summary>
+    [SerializeField] private AudioClip revealSound;
+
+    /// <summary>Sonido al colocar/quitar bandera</summary>
+    [SerializeField] private AudioClip flagSound;
+
+    /// <summary>Sonido al explotar una mina</summary>
+    [SerializeField] private AudioClip explosionSound;
+
     // ========== CONFIGURACIÓN DE TAMAÑO DE CELDAS ==========
     /// <summary>Tamaño base de cada celda en píxeles</summary>
     [Header("Cell Settings")]
@@ -216,12 +230,21 @@ public class GameManager : MonoBehaviour
         // Si tocó una mina, fin del juego
         if (hitMine)
         {
+            // ===== REPRODUCIR SONIDO DE EXPLOSIÓN =====
+            PlaySound(explosionSound);
+            // ==========================================
             GameOver(false);
         }
         // Verificar victoria
         else if (gameBoard.CheckWin())
         {
             GameOver(true);
+        }
+        else
+        {
+            // ===== REPRODUCIR SONIDO DE REVELAR =====
+            PlaySound(revealSound);
+            // ========================================
         }
     }
 
@@ -241,6 +264,10 @@ public class GameManager : MonoBehaviour
             // Cambiar estado de bandera
             bool wasFlaged = node.IsFlagged;
             gameBoard.ToggleFlag(x, y);
+            
+            // ===== REPRODUCIR SONIDO DE BANDERA =====
+            PlaySound(flagSound);
+            // ========================================
             
             // Actualizar contador de banderas
             if (node.IsFlagged && !wasFlaged)
@@ -329,11 +356,11 @@ public class GameManager : MonoBehaviour
         while (isTimerRunning)
         {
             yield return new WaitForSeconds(1f);
-            
+
             if (isTimerRunning)
             {
                 elapsedTime++;
-                
+
                 if (uiManager != null)
                 {
                     uiManager.UpdateTimer(elapsedTime);
@@ -341,4 +368,17 @@ public class GameManager : MonoBehaviour
             }
         }
     }
+    
+    /// <summary>
+    /// Reproduce un sonido si el AudioSource y el clip están disponibles.
+    /// </summary>
+    /// <param name="clip">AudioClip a reproducir</param>
+    private void PlaySound(AudioClip clip)
+    {
+        if (audioSource != null && clip != null)
+        {
+            audioSource.PlayOneShot(clip);
+        }
+    }
+
 }
