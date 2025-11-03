@@ -21,9 +21,12 @@ public class UIManager : MonoBehaviour
     
     /// <summary>Panel de victoria</summary>
     [SerializeField] private GameObject winPanel;
-    
+
     /// <summary>Panel de derrota</summary>
     [SerializeField] private GameObject losePanel;
+    
+    /// <summary>Panel de instrucciones "Cómo Jugar"</summary>
+    [SerializeField] private GameObject howToPlayPanel;
 
     // ========== ELEMENTOS DE JUEGO ==========
     /// <summary>Texto que muestra el contador de minas restantes</summary>
@@ -87,6 +90,12 @@ public class UIManager : MonoBehaviour
     /// <summary>Texto de tiempo en pantalla de victoria</summary>
     [SerializeField] private TextMeshProUGUI winTimeText;
 
+    /// <summary>Botón para abrir el panel de instrucciones</summary>
+    [SerializeField] private Button howToPlayButton;
+
+    /// <summary>Botón para cerrar el panel de instrucciones</summary>
+    [SerializeField] private Button closeHowToPlayButton;
+
     // ========== REFERENCIAS ==========
     /// <summary>Referencia al GameManager</summary>
     private GameManager gameManager;
@@ -108,9 +117,17 @@ public class UIManager : MonoBehaviour
         
         if (expertButton != null)
             expertButton.onClick.AddListener(() => StartGame(DifficultySettings.Difficulty.Expert));
-        
+
         if (customButton != null)
             customButton.onClick.AddListener(ShowCustomPanel);
+            
+        // Botón "¿Cómo Jugar?"
+        if (howToPlayButton != null)
+            howToPlayButton.onClick.AddListener(ShowHowToPlayPanel);
+
+        // Botón "Cerrar" dentro del panel
+        if (closeHowToPlayButton != null)
+            closeHowToPlayButton.onClick.AddListener(HideHowToPlayPanel);
 
         // Configurar botones de configuración personalizada
         if (startCustomButton != null)
@@ -181,6 +198,24 @@ public class UIManager : MonoBehaviour
     }
 
     /// <summary>
+    /// Muestra el panel de instrucciones "Cómo Jugar".
+    /// </summary>
+    private void ShowHowToPlayPanel()
+    {
+        if (mainMenuPanel != null) mainMenuPanel.SetActive(false);
+        if (howToPlayPanel != null) howToPlayPanel.SetActive(true);
+    }
+
+    /// <summary>
+    /// Oculta el panel de instrucciones y vuelve al menú principal.
+    /// </summary>
+    private void HideHowToPlayPanel()
+    {
+        if (howToPlayPanel != null) howToPlayPanel.SetActive(false);
+        if (mainMenuPanel != null) mainMenuPanel.SetActive(true);
+    }
+
+    /// <summary>
     /// Inicia una partida con configuración personalizada.
     /// Valida los valores ingresados por el usuario.
     /// </summary>
@@ -192,7 +227,7 @@ public class UIManager : MonoBehaviour
             int.TryParse(minesInput.text, out int mines))
         {
             DifficultySettings settings = new DifficultySettings(width, height, mines);
-            
+
             // Validar configuración
             if (settings.IsValid())
             {
